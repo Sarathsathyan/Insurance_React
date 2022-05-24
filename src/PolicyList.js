@@ -5,8 +5,10 @@ import 'font-awesome/css/font-awesome.min.css';
 
 const PolicyList =()=>{
     const [name, setName] = useState("");
+    const [fuel, setFuel] = useState("");
     const [policy, setPolicy] = useState([]);
     const [policyID, setPolicyId] = useState(null);
+    const [id, setId] = useState(null);
     
     useEffect(() => {
         refreshPolicy();
@@ -35,13 +37,39 @@ const PolicyList =()=>{
       };
     
       const onUpdate = (id) => {
-        let item = { name };
+        let item = { fuel };
         API.patch(`/policy/${id}/`, item).then((res) => refreshPolicy());
       };
 
-      function selectMovie(id) {
+      function selectPolicy(id) {
+        console.log(id)
         let item = policy.filter((policy) => policy.id === id)[0];
-        setName(item.name);
+        console.log(item)
+        setName(item.policy_id);
+        setFuel(item.fuel);
+        setId(item.id)
+      }
+      
+      const handleChange = (event) => {
+        setName(event.target.value);
+      }
+      function search(name){
+          let items =[]
+          if (name == ''){
+              items = policy
+          }
+          else{
+            console.log(124)
+          console.log(name)
+            items = policy.filter((policy) => {
+            console.log(policy.policy_id+'')
+            return (policy.policy_id+'').includes(name+'')
+        });
+          }
+          
+
+        setPolicy(items)
+
       }
 
    return (
@@ -51,28 +79,30 @@ const PolicyList =()=>{
            <h3 className="float-left">Edit Policy Data</h3>
            <Form onSubmit={onSubmit} className="mt-4">
              <Form.Group className="mb-3" controlId="formBasicName">
-               <Form.Label>{policyID}Name</Form.Label>
+               <Form.Label>{policyID}Policy Id</Form.Label>
                <Form.Control
                  type="text"
-                 placeholder="Enter Name"
+                 placeholder="Enter PolicyID"
                  value={name}
-                 onChange={(e) => setName(e.target.value)}
+                 onChange={(e) => setName(e.target.value)} disabled
+               />
+             </Form.Group>
+             <Form.Group className="mb-3" controlId="formBasicName">
+               <Form.Label>{policyID}Fuel</Form.Label>
+               <Form.Control
+                 type="text"
+                 placeholder="Enter Fuel"
+                 value={fuel}
+                 onChange={(e) => setFuel(e.target.value)} 
                />
              </Form.Group>
              <div className="float-right">
-              <Button
-                variant="primary"
-                type="submit"
-                onClick={onSubmit}
-                className="mx-2"
-              >
-                Save
-              </Button>
+             
               <Button
                 variant="primary"
                 type="button"
-                onClick={() => onUpdate(policyID)}
-                className="mx-2"
+                onClick={() => onUpdate(id)}
+                className="mx-2" 
               >
                 Update
               </Button>
@@ -80,6 +110,8 @@ const PolicyList =()=>{
            </Form>
          </div>
          <div className="col-md-8 m">
+             <input type="text" placeholder="Enter Policy ID" onChange={handleChange}></input>
+             <button onClick={() => search(name)}>Submit</button>
            <table className="table">
              <thead>
                <tr>
@@ -87,6 +119,7 @@ const PolicyList =()=>{
                  <th scope="col">Customer ID</th>
                  <th scope="col">Purchase Date</th>
                  <th scope="col">Income</th>
+                 <th scope="col">Fuel</th>
 
                  <th scope="col"></th>
                </tr>
@@ -94,31 +127,19 @@ const PolicyList =()=>{
              <tbody>
                {policy.map((policy, index) => {
                  return (
-                   <tr key="">
-                     <th scope="row">{policy.id}</th>
+                   <tr key={index}>
+                     <th scope="row">{policy.policy_id}</th>
                      <td>{policy.customer_id}</td>
                      <td>{policy.date_of_purchase}</td>
                      <td>{policy.income}</td>
+                     <td>{policy.fuel}</td>
                      <td>
                       <i
                         className="fa fa-pencil-square text-primary d-inline"
                         aria-hidden="true"
-                        onClick={() => selectMovie(policy.id)}
+                        onClick={() => selectPolicy(policy.id)}
                       ></i>
                     </td>
-
-                     {/* <td>
-                      <i
-                        className="fa fa-pencil-square text-primary d-inline"
-                        aria-hidden="true"
-                        onClick={() => selectMovie(movie.id)}
-                      ></i>
-                      <i
-                        className="fa fa-trash-o text-danger d-inline mx-3"
-                        aria-hidden="true"
-                        onClick={() => onDelete(movie.id)}
-                      ></i>
-                    </td> */}
                    </tr>
                  );
                })}
